@@ -1,0 +1,48 @@
+{
+    "serviceName":"go-skeleton-project",
+    "serviceVersion":"1.0",
+    "serviceMaintenance":false,
+    "serviceConfiguration":{
+        "serviceCertificates":{
+            "certLocation":"",
+            "keyLocation":""
+        },
+        "serviceLDAPConnection":{
+            "dialUrl":"",
+            "bindUsername":"",
+            "bindPassword":""
+        },
+        "serviceLog":{
+            "logPath":"logs/",
+            "logFormatter":""
+        },
+        "serviceAPISecurity":{
+            "tokenExpiryDuration":8,
+            "allowOrigin":"*",
+            "allowedMethods":"GET,POST"
+        },
+        "serviceVCenterDetails": {
+            "hostName" : "x.x.x.x",
+            "httpScheme" : "https",
+            "path" : "sdk",
+            "serviceAccount": "user@vsphere.local",
+            "password": "thBc43bWxEqw0m4po+DdRVto9SYhFZfXmimkIJwuquabcs8tjA=="
+        },
+        "serviceCorsDetais": {
+            "accessAllowedOrigin": "*",
+            "accessAllowedHeaders":  "*"
+        },
+        "serviceDbConnections":[
+            {
+                "aarangoDb":{
+                    "hostname":"http://x.x.x.x",
+                    "port":"8529",
+                    "username":"root",
+                    "password":"",
+                    "dbName":"iotss"
+                }
+            }
+        ]
+    }
+}
+

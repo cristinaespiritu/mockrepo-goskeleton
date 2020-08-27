@@ -1,0 +1,69 @@
+#!/bin/bash
+
+GOLANGCILINT=$GOPATH/bin/golangci-lint
+COVERAGETHRESHOLD=80.0
+# Check for golangci-lint
+if [[ ! -x "$GOLANGCILINT" ]]; then
+  printf "\t\033[41mPlease install golangci-lint\033[0m (curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.24.0)"
+  exit 1
+fi
+
+STAGED_GO_FILES=$(git diff --cached --name-only | grep "\.go$")
+#STAGED_GO_UT_FILES=$(git diff --cached --name-only | grep "\_unit_test.go$")
+
+if [[ "$STAGED_GO_FILES" = "" ]]; then
+  printf "No go files to commit\n"
+  exit 0
+fi
+
+PASS=true
+
+printf "\nLinting Go Files\n\n"
+#for FILE in $STAGED_GO_FILES
+#do
+  # Run golangci-lint on the staged file and check the exit status
+echo "$GOLANGCILINT run"
+$GOLANGCILINT run
+  if [[ $? == 1 ]]; then
+    printf "golangci-lint failed \n"
+    PASS=false
+  else
+    printf "golangci-lint passed \n"
+  fi
+#done
+
+printf "\nRunning Unit Tests and Checking Coverage\n\n"
+  #echo "$TESTFILE"
+  #FILE=$(echo $TESTFILE | awk '{gsub("_unit_test","");print}')
+  #echo "$FILE"
+  #echo "go test  $FILE $TESTFILE -tags=unit -v -cover"
+  #go test $FILE $TESTFILE -tags=unit -v -cover
+  go test ./... -tags=unit -v -coverprofile cover.out
+  returncode=$?
+  if [ $returncode -ne 0 ]; then
+    printf "Unit Test Failed \n"
+    PASS=false
+  else
+  #  printf "unit test passed at $TESTFILE\n"
+  #  printf "Checking coverage\n"
+    #coverage=$(go test $FILE $TESTFILE -tags=unit -v -coverprofile=$i.coverprofile ./$i 2> /dev/null | grep "coverage" 2> /dev/null | sed -E "s/^.+ ([0-9.%]+) .+/\1/" | tr -d '%' | uniq)  
+    Overallcoverage=$(go tool cover -func cover.out | grep total | awk '{print $3}')
+    if [ $Overallcoverage \> $COVERAGETHRESHOLD ]
+					then
+						echo "$coverage% is greater than $COVERAGETHRESHOLD% for $TESTFILE"
+				else
+					echo "The coverage $Overallcoverage did not meet the threshold $COVERAGETHRESHOLD%"
+					PASS=false
+		fi
+  fi
+  
+
+if ! $PASS; then
+  printf "\033[0;30m\033[41mCOMMIT FAILED\033[0m\n"
+  exit 1
+else
+  printf "\033[0;30m\033[42mCOMMIT SUCCEEDED\033[0m\n"
+fi
+
+
+exit 0
